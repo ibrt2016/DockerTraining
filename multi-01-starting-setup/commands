@@ -1,0 +1,14 @@
+docker build -t goals-backend .
+docker build -t goals-frontend .
+
+docker network create goals-net
+docker network create goals-frontend-backend
+
+docker run -d --network goals-net --name goals-mongodb-app -v goals-mongodb-data:/data/db --rm \
+	-e MONGO_INITDB_ROOT_USERNAME=mongoadmin \
+	-e MONGO_INITDB_ROOT_PASSWORD=secret \
+	mongo
+
+docker run -d --network goals-net -p 80:80 --name goals-backend-app -v logs:/app/logs -v "/home/admin/DockerTraining/multi-01-starting-setup/backend:/app" -v /app/node_modules --rm goals-backend
+
+docker run -it --network goals-net -p 3000:3000 --name goals-frontend-app  --rm goals-frontend
